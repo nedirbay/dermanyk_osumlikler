@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../core/services/database_service.dart';
 import '../../data/models/plant.dart';
+import '../widgets/plant_image.dart';
 import 'plant_detail_page.dart';
+import 'plant_form_page.dart';
 
 class PlantsPage extends StatefulWidget {
   const PlantsPage({super.key});
@@ -38,6 +40,19 @@ class _PlantsPageState extends State<PlantsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PlantFormPage()),
+          );
+          if (result == true) {
+            _loadPlants(_searchController.text);
+          }
+        },
+        backgroundColor: const Color(0xFF2E7D32),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -73,7 +88,10 @@ class _PlantsPageState extends State<PlantsPage> {
                     ? const SliverFillRemaining(child: Center(child: Text('Ösümlik tapylmady')))
                     : SliverList(
                         delegate: SliverChildBuilderDelegate(
-                          (context, index) => _PlantCard(plant: _plants[index]),
+                          (context, index) => _PlantCard(
+                            plant: _plants[index],
+                            onRefresh: () => _loadPlants(_searchController.text),
+                          ),
                           childCount: _plants.length,
                         ),
                       ),
@@ -158,8 +176,9 @@ class _PlantsPageState extends State<PlantsPage> {
 
 class _PlantCard extends StatelessWidget {
   final Plant plant;
+  final VoidCallback onRefresh;
 
-  const _PlantCard({required this.plant});
+  const _PlantCard({required this.plant, required this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -179,30 +198,26 @@ class _PlantCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: InkWell(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => PlantDetailPage(plant: plant)),
-          ),
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => PlantDetailPage(plant: plant)),
+            );
+            if (result == true) {
+              onRefresh();
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Hero(
-                    tag: 'plant_${plant.id}',
-                    child: Image.network(
-                      plant.imageUrl,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        width: 100,
-                        height: 100,
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        child: Icon(Icons.eco, color: Theme.of(context).primaryColor, size: 40),
-                      ),
-                    ),
+                Hero(
+                  tag: 'plant_${plant.id}',
+                  child: PlantImage(
+                    imageUrl: plant.imageUrl,
+                    width: 100,
+                    height: 100,
+                    borderRadius: 20,
                   ),
                 ),
                 const SizedBox(width: 16),

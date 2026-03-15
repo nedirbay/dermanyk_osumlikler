@@ -1,10 +1,72 @@
 import 'package:flutter/material.dart';
+import '../../core/services/database_service.dart';
 import '../../data/models/plant.dart';
+import '../widgets/plant_image.dart';
+import 'plant_form_page.dart';
 
-class PlantDetailPage extends StatelessWidget {
+class PlantDetailPage extends StatefulWidget {
   final Plant plant;
 
   const PlantDetailPage({super.key, required this.plant});
+
+  @override
+  State<PlantDetailPage> createState() => _PlantDetailPageState();
+}
+
+class _PlantDetailPageState extends State<PlantDetailPage> {
+  late Plant _currentPlant;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPlant = widget.plant;
+  }
+
+  Future<void> _editPlant() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PlantFormPage(plant: _currentPlant),
+      ),
+    );
+
+    if (result == true) {
+      // Refresh current plant data (simple way: search by ID)
+      final updatedPlants = await DatabaseService.instance.searchPlants(_currentPlant.name);
+      final updated = updatedPlants.firstWhere((p) => p.id == _currentPlant.id, orElse: () => _currentPlant);
+      setState(() {
+        _currentPlant = updated;
+      });
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Öçürmek'),
+        content: const Text('Siz hakykatdan hem bu ösümligi öçürmek isleýärsiňizmi?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Ýatyrmak'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Öçürmek'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await DatabaseService.instance.deletePlant(_currentPlant.id!);
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,22 +77,16 @@ class PlantDetailPage extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 250,
             pinned: true,
+            actions: [
+              IconButton(onPressed: _editPlant, icon: const Icon(Icons.edit)),
+              IconButton(onPressed: _confirmDelete, icon: const Icon(Icons.delete)),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Hero(
-                tag: 'plant_${plant.id}',
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                  child: Image.network(
-                    plant.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: const Color(0xFFA5D6A7),
-                      child: const Icon(Icons.eco, size: 100, color: Colors.white),
-                    ),
-                  ),
+                tag: 'plant_${_currentPlant.id}',
+                child: PlantImage(
+                  imageUrl: _currentPlant.imageUrl,
+                  borderRadius: 30, // Using borderRadius logic in widget
                 ),
               ),
             ),
@@ -43,32 +99,32 @@ class PlantDetailPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 _buildCard(
                   title: 'Gysga düşündiriş',
-                  content: plant.description,
+                  content: _currentPlant.description,
                   icon: Icons.info_outline,
                 ),
                 _buildCard(
                   title: 'Peýdaly aýratynlyklary',
-                  content: plant.medicalUses,
+                  content: _currentPlant.medicalUses,
                   icon: Icons.eco,
                 ),
                 _buildCard(
                   title: 'Ulanylýan bölegi',
-                  content: plant.usedPart,
+                  content: _currentPlant.usedPart,
                   icon: Icons.list_alt,
                 ),
                 _buildCard(
                   title: 'Taýýarlanyş usuly',
-                  content: plant.preparationMethod,
+                  content: _currentPlant.preparationMethod,
                   icon: Icons.local_cafe_outlined,
                 ),
                 _buildCard(
                   title: 'Himiki düzümi',
-                  content: plant.chemicalComposition,
+                  content: _currentPlant.chemicalComposition,
                   icon: Icons.science_outlined,
                 ),
                 _buildCard(
                   title: 'Garşy görkezmeler',
-                  content: plant.contraindications,
+                  content: _currentPlant.contraindications,
                   icon: Icons.warning_amber_rounded,
                   isWarning: true,
                 ),
@@ -93,7 +149,7 @@ class PlantDetailPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    plant.name,
+                    _currentPlant.name,
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -101,7 +157,7 @@ class PlantDetailPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    plant.scientificName,
+                    _currentPlant.scientificName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontStyle: FontStyle.italic,

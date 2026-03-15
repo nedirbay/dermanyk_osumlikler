@@ -1,41 +1,53 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color(0xFF2E7D32);
-  static const Color secondaryColor = Color(0xFF66BB6A);
-  static const Color accentColor = Color(0xFFA5D6A7);
-  static const Color backgroundColor = Color(0xFFF1F8E9);
-  static const Color textPrimary = Color(0xFF1B5E20);
-  static const Color textSecondary = Color(0xFF4E6E50);
+  static const Color primaryColor = Color(0xFF00C853); // Vibrant Green A700
+  static const Color primaryDark = Color(0xFF1B5E20);
+  static const Color secondaryColor = Color(0xFF64DD17); // Light Green A700
+  static const Color backgroundColor = Color(0xFFF9FDF9);
+  static const Color surfaceColor = Colors.white;
+  static const Color textPrimary = Color(0xFF0A2E0D);
+  static const Color textSecondary = Color(0xFF436B46);
 
   static ThemeData get lightTheme {
     return ThemeData(
-      primaryColor: primaryColor,
-      scaffoldBackgroundColor: backgroundColor,
+      useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         primary: primaryColor,
         secondary: secondaryColor,
-        surface: Colors.white,
+        surface: surfaceColor,
+        background: backgroundColor,
+        onPrimary: Colors.white,
+        onSurface: textPrimary,
       ),
-      useMaterial3: true,
+      scaffoldBackgroundColor: backgroundColor,
       cardTheme: CardThemeData(
-        elevation: 2,
+        elevation: 0,
+        color: surfaceColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: primaryColor.withOpacity(0.1), width: 1),
         ),
       ),
-      textTheme: const TextTheme(
-        bodyLarge: TextStyle(color: textPrimary),
-        bodyMedium: TextStyle(color: textSecondary),
-        titleLarge: TextStyle(color: textPrimary, fontWeight: FontWeight.bold),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: textPrimary,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         selectedItemColor: primaryColor,
-        unselectedItemColor: Color(0xFF7A8B7A),
-        backgroundColor: Colors.white,
+        unselectedItemColor: Color(0xFF9E9E9E),
+        backgroundColor: surfaceColor,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
+        elevation: 8,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        unselectedLabelStyle: TextStyle(fontSize: 12),
       ),
     );
   }

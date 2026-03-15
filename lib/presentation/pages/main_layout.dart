@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'chatbot_page.dart';
 import 'plants_page.dart';
 import 'dictionary_page.dart';
+import 'folk_medicine_page.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -17,6 +18,7 @@ class _MainLayoutState extends State<MainLayout> {
     const ChatbotPage(),
     const PlantsPage(),
     const DictionaryPage(),
+    const FolkMedicinePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -33,26 +35,31 @@ class _MainLayoutState extends State<MainLayout> {
         children: _pages,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
           boxShadow: [
-            BoxShadow(color: Colors.black12, spreadRadius: 0, blurRadius: 10),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
           ],
         ),
         child: ClipRRect(
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
           child: BottomNavigationBar(
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Icon(Icons.chat_bubble_outline),
-                activeIcon: Icon(Icons.chat_bubble),
-                label: 'Akylly maslahat',
+                icon: Icon(Icons.chat_bubble_outline_rounded),
+                activeIcon: Icon(Icons.chat_bubble_rounded),
+                label: 'Söhbet',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.eco_outlined),
@@ -62,7 +69,12 @@ class _MainLayoutState extends State<MainLayout> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.science_outlined),
                 activeIcon: Icon(Icons.science),
-                label: 'Himiki sözlük',
+                label: 'Sözlük',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.history_edu_outlined),
+                activeIcon: Icon(Icons.history_edu),
+                label: 'Halk',
               ),
             ],
             currentIndex: _selectedIndex,

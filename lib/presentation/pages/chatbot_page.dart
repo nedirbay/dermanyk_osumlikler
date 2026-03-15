@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/models/chat_message.dart';
+import '../../core/services/ai_service.dart';
+import '../../core/services/database_service.dart';
 
 class ChatbotPage extends StatefulWidget {
   const ChatbotPage({super.key});
@@ -10,47 +12,91 @@ class ChatbotPage extends StatefulWidget {
 
 class _ChatbotPageState extends State<ChatbotPage> {
   final TextEditingController _controller = TextEditingController();
-  final List<ChatMessage> _messages = [
-    ChatMessage(
-      text: "Salam! Men Türkmenistanyň dermanlyk ösümlikleri boýunça size maslahat berip biljek emeli aň. Size nähili kömek edip bilerim?",
-      isUser: false,
-    ),
-  ];
+  final AiService _aiService = AiService();
+  bool _isAiLoading = false;
+  List<ChatMessage> _messages = [];
 
-  void _handleSend() {
-    if (_controller.text.trim().isEmpty) return;
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+  }
+
+  Future<void> _loadMessages() async {
+    final messages = await DatabaseService.instance.getChatMessages();
     setState(() {
-      _messages.add(ChatMessage(text: _controller.text, isUser: true));
-      _controller.clear();
-      // Simulate AI response
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() {
-            _messages.add(ChatMessage(
-              text: "Hazirki wagtda bu funksiýa işlenip düzülýär. Soragyňyz kabul edildi!",
-              isUser: false,
-            ));
-          });
-        }
-      });
+      if (messages.isEmpty) {
+        _messages = [
+          ChatMessage(
+            text: "Salam! Men Türkmenistanyň dermanlyk ösümlikleri boýunça size maslahat berip biljek emeli aň. Size nähili kömek edip bilerim?",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
+        ];
+      } else {
+        _messages = messages;
+      }
     });
   }
 
-  void _sendSuggested(String text) {
+  void _handleSend() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _isAiLoading) return;
+
+    _controller.clear();
+    final userMessage = ChatMessage(text: text, isUser: true, timestamp: DateTime.now());
+    
     setState(() {
-      _messages.add(ChatMessage(text: text, isUser: true));
-      // Simulate AI response
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          setState(() {
-            _messages.add(ChatMessage(
-              text: "Bellenen mowzuk boýunça maglumatlar taýýarlanylýar...",
-              isUser: false,
-            ));
-          });
-        }
-      });
+      _messages.add(userMessage);
+      _isAiLoading = true;
     });
+
+    await DatabaseService.instance.saveChatMessage(userMessage);
+
+    final response = await _aiService.sendMessage(text);
+    final aiMessage = ChatMessage(
+      text: response,
+      isUser: false,
+      timestamp: DateTime.now(),
+    );
+
+    if (mounted) {
+      setState(() {
+        _isAiLoading = false;
+        _messages.add(aiMessage);
+      });
+    }
+
+    await DatabaseService.instance.saveChatMessage(aiMessage);
+  }
+
+  void _sendSuggested(String text) async {
+    if (_isAiLoading) return;
+
+    final userMessage = ChatMessage(text: text, isUser: true, timestamp: DateTime.now());
+
+    setState(() {
+      _messages.add(userMessage);
+      _isAiLoading = true;
+    });
+
+    await DatabaseService.instance.saveChatMessage(userMessage);
+
+    final response = await _aiService.sendMessage(text);
+    final aiMessage = ChatMessage(
+      text: response,
+      isUser: false,
+      timestamp: DateTime.now(),
+    );
+
+    if (mounted) {
+      setState(() {
+        _isAiLoading = false;
+        _messages.add(aiMessage);
+      });
+    }
+
+    await DatabaseService.instance.saveChatMessage(aiMessage);
   }
 
   @override
@@ -79,8 +125,11 @@ class _ChatbotPageState extends State<ChatbotPage> {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
+              itemCount: _messages.length + (_isAiLoading ? 1 : 0),
               itemBuilder: (context, index) {
+                if (index == _messages.length) {
+                  return const _AiLoadingBubble();
+                }
                 final message = _messages[index];
                 return _ChatBubble(message: message);
               },
@@ -201,6 +250,36 @@ class _InputArea extends StatelessWidget {
             icon: const Icon(Icons.send, color: Color(0xFF2E7D32)),
           ),
         ],
+      ),
+    );
+  }
+}
+class _AiLoadingBubble extends StatelessWidget {
+  const _AiLoadingBubble();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: const BoxDecoration(
+          color: Color(0xFFE8F5E9),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(16),
+            bottomRight: Radius.circular(16),
+          ),
+        ),
+        child: const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2E7D32)),
+          ),
+        ),
       ),
     );
   }

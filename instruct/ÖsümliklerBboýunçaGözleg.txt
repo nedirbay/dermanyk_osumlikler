@@ -1,0 +1,47 @@
+Create the page **“Ösümlikler boýunça gözleg”**
+for the application “Türkmenistanyň dermanlyk ösümlikleri”.
+
+Purpose:
+Allow users to search and explore medicinal plants.
+
+Layout:
+
+Top header:
+Title: “Ösümlikler”
+
+Search section:
+
+* large search bar
+* placeholder text:
+  “Ösümlik ady boýunça gözleg...”
+
+Filters:
+
+* keseller boýunça
+* ulanylýan bölegi
+* ösýän ýerleri
+
+Plant list section:
+
+Display plant cards in a vertical list.
+
+Each card must include:
+
+* plant image
+* plant name
+* short description
+* small tag showing medicinal use
+
+Card style:
+
+* rounded corners
+* light shadow
+* white background
+
+When user taps a card, open a **Plant Detail Page** showing:
+
+* name
+* description
+* medicinal properties
+* preparation method
+* related diseases

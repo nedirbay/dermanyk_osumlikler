@@ -1,0 +1,31 @@
+Create a **Bottom Navigation Bar** component for the application
+“Türkmenistanyň dermanlyk ösümlikleri”.
+
+Requirements:
+
+The navigation bar must contain three tabs:
+
+1. Akylly maslahat
+   icon: chat bubble
+   purpose: open the AI chatbot that gives advice about medicinal plants
+
+2. Ösümlikler
+   icon: leaf
+   purpose: search and explore medicinal plants
+
+3. Himiki sözlük
+   icon: science or molecule
+   purpose: dictionary of chemical compounds found in plants
+
+Design:
+
+* fixed bottom navigation
+* rounded top corners
+* soft shadow
+* active tab color: #2E7D32
+* inactive tab color: #7A8B7A
+* background color: white
+* icon size: medium
+* label under each icon
+
+Ensure the navigation switches between three pages smoothly.

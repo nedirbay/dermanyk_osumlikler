@@ -1,0 +1,30 @@
+Create a modern mobile-first application named **“Türkmenistanyň dermanlyk ösümlikleri”**.
+
+Design goal:
+A clean, nature-inspired interface focused on medicinal plants and scientific knowledge.
+
+Use the following color palette across the entire application:
+
+Primary color: #2E7D32 (deep herbal green)
+Secondary color: #66BB6A (soft plant green)
+Accent color: #A5D6A7 (light botanical green)
+Background color: #F1F8E9 (very light natural green)
+Text primary: #1B5E20
+Text secondary: #4E6E50
+
+UI style:
+
+* soft rounded corners (16px)
+* light shadows
+* minimalistic cards
+* plant-themed icons
+* clear typography
+* responsive mobile layout
+
+The application will have three main sections:
+
+1. Akylly maslahat (AI chatbot)
+2. Ösümlikler boýunça gözleg
+3. Himiki sözlük
+
+Prepare the layout so it works well with a bottom navigation bar.

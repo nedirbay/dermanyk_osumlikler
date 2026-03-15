@@ -1,0 +1,38 @@
+Create the page **“Himiki sözlük”**
+for the application “Türkmenistanyň dermanlyk ösümlikleri”.
+
+Purpose:
+Provide explanations of chemical compounds found in medicinal plants.
+
+Layout:
+
+Header:
+Title: “Himiki sözlük”
+
+Search bar:
+placeholder text:
+“Himiki maddany gözle...”
+
+Dictionary list:
+
+Display entries in alphabetical order.
+
+Each entry card includes:
+
+* compound name
+* short scientific explanation
+* plants that contain this compound
+
+Example entries:
+
+Alkaloid
+Flavonoid
+Tanin
+Saponin
+
+Design:
+
+cards with light green border
+background: white
+rounded corners
+clear readable typography

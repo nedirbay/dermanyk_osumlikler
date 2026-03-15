@@ -1,0 +1,22 @@
+Create the page **“Halk lukmançylygy”**
+for the application “Türkmenistanyň dermanlyk ösümlikleri”.
+
+Purpose:
+Explain traditional medicinal practices used in Turkmen herbal medicine.
+
+Content sections:
+
+1. Halk lukmançylygynyň taryhy
+   Short explanation of traditional healing practices.
+
+2. Meşhur dermanlyk ösümlikler
+   List plants commonly used in traditional medicine.
+
+3. Halk arasynda giňden ulanylýan reseptler
+   Example herbal remedies.
+
+Example:
+• sowuklama üçin çaý
+• aşgazan üçin gaýnatma
+
+Use simple educational cards with illustrations.

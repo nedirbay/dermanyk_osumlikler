@@ -1,0 +1,33 @@
+Create a page called **“Bilim bölümi”**
+for the application “Türkmenistanyň dermanlyk ösümlikleri”.
+
+Purpose:
+Provide educational content about medicinal plants, herbal medicine, and plant chemistry.
+
+Layout:
+
+Top header:
+Title: “Bilim bölümi”
+
+Below the header display category cards.
+
+Categories:
+
+1. Dermanlyk ösümlikler barada umumy maglumat
+2. Halk lukmançylygy
+3. Ösümlikleriň himiki düzümi
+4. Derman taýýarlamak usullary
+5. Howpsuzlyk maslahatlary
+
+Each category should be displayed as a card with:
+
+* icon
+* title
+* short description
+
+Design:
+
+grid layout (2 columns)
+rounded cards
+soft green icons
+white card background

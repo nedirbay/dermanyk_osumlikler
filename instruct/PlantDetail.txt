@@ -1,0 +1,75 @@
+Create a **Plant Detail Page** for the application
+“Türkmenistanyň dermanlyk ösümlikleri”.
+
+Purpose:
+Display full information about a medicinal plant.
+
+Layout:
+
+Top section:
+Large plant image with rounded corners.
+
+Overlay area on image:
+
+* plant name
+* latin name
+* small medicinal tag
+
+Example:
+Plant name: Yşga
+Latin name: Peganum harmala
+
+Main information card:
+
+Sections to include:
+
+1. Gysga düşündiriş
+   A short description of the plant and its importance in traditional medicine.
+
+2. Peýdaly aýratynlyklary
+   List medicinal benefits of the plant.
+
+Example:
+• Sowuklama garşy
+• Aşgazan üçin peýdaly
+• Antibakterial täsir
+
+3. Ulanylýan bölegi
+   Which part of the plant is used:
+   • kök
+   • ýaprak
+   • miwe
+   • tohum
+
+4. Taýýarlanyş usuly
+   Explain how the plant is prepared as medicine.
+
+Example:
+• çaý taýýarlamak
+• gaýnatma
+• damja görnüşinde ulanmak
+
+5. Himiki düzümi
+   List important chemical compounds.
+
+Example:
+• alkaloidler
+• flavonoidler
+• taninler
+
+6. Garşy görkezmeler
+   Safety warnings.
+
+Example:
+• göwreli aýallar üçin maslahat berilmeýär
+• ýokary dozada zyýanly bolup biler
+
+Design:
+
+background: #F1F8E9
+cards: white
+card radius: 16px
+
+Use icons for sections:
+leaf icon for medicinal properties
+science icon for chemical composition

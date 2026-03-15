@@ -1,0 +1,44 @@
+Create the page **“Akylly maslahat”** for the application
+“Türkmenistanyň dermanlyk ösümlikleri”.
+
+Purpose:
+An AI chatbot that gives guidance about medicinal plants based on user questions.
+
+Layout structure:
+
+Top header:
+Title: “Akylly maslahat”
+Subtitle: “Dermanlyk ösümlikler boýunça emeli aň maslahat berýär”
+
+Main area:
+Chat interface similar to modern messaging apps.
+
+Components:
+
+1. Chat message list
+
+   * user messages on the right
+   * AI messages on the left
+   * rounded chat bubbles
+
+2. Input area at the bottom
+
+   * text input
+   * send button
+   * placeholder text:
+     “Soragyňyzy ýazyn... mysal: sowuklama üçin haýsy ösümlik peýdaly?”
+
+3. Suggested questions card
+   show 3 quick suggestions:
+
+   * “Aşgazan üçin peýdaly ösümlikler”
+   * “Sowuklama garşy ösümlikler”
+   * “Gan basyşyny peseldýän ösümlikler”
+
+Design:
+
+background: #F1F8E9
+chat bubble AI: #E8F5E9
+chat bubble user: #C8E6C9
+
+Make the interface simple, readable, and friendly.

@@ -13,7 +13,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Türkmenistanyň dermanlyk ösümlikleri',
+      title: 'Dermanlyk ösümlikler',
       theme: AppTheme.lightTheme,
       home: const MainLayout(),
       debugShowCheckedModeBanner: false,

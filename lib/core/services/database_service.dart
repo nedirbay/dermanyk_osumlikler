@@ -1,9 +1,10 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import '../../data/models/plant.dart';
-import '../../data/models/compound.dart';
-import '../../data/models/chat_message.dart';
+import 'package:plant/data/models/plant.dart';
+import 'package:plant/data/models/recipe.dart';
+import 'package:plant/data/models/compound.dart';
+import 'package:plant/data/models/chat_message.dart';
 
 class DatabaseService {
   static final DatabaseService instance = DatabaseService._init();
@@ -38,11 +39,30 @@ class DatabaseService {
       await _seedCompounds(db);
     }
 
+    // Ensure recipes table exists
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS recipes(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        description TEXT,
+        ingredients TEXT,
+        instructions TEXT,
+        category TEXT,
+        imageUrl TEXT
+      )
+    ''');
+
     // Check if we need to re-seed plants (ensure 20 plants are loaded)
     final plantCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM plants'));
     if (plantCount != null && plantCount < 20) {
       await db.delete('plants');
       await _seedData(db);
+    }
+
+    // Check if recipes need seeding
+    final recipeCount = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM recipes'));
+    if (recipeCount == 0) {
+      await _seedRecipes(db);
     }
 
     return db;
@@ -86,7 +106,80 @@ CREATE TABLE chat_messages (
 )
 ''');
 
+    await db.execute('''
+CREATE TABLE recipes (
+  id $idType,
+  title $textType,
+  description $textType,
+  ingredients $textType,
+  instructions $textType,
+  category $textType,
+  imageUrl TEXT
+)
+''');
+
     await _seedData(db);
+  }
+
+  // Recipe Operations
+  Future<List<Recipe>> getAllRecipes() async {
+    final db = await instance.database;
+    final result = await db.query('recipes');
+    return result.map((json) => Recipe.fromMap(json)).toList();
+  }
+
+  Future<int> insertRecipe(Recipe recipe) async {
+    final db = await instance.database;
+    return await db.insert('recipes', recipe.toMap());
+  }
+
+  Future<int> updateRecipe(Recipe recipe) async {
+    final db = await instance.database;
+    return await db.update(
+      'recipes',
+      recipe.toMap(),
+      where: 'id = ?',
+      whereArgs: [recipe.id],
+    );
+  }
+
+  Future<int> deleteRecipe(int id) async {
+    final db = await instance.database;
+    return await db.delete(
+      'recipes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> _seedRecipes(Database db) async {
+    final recipes = [
+      Recipe(
+        title: 'Sowuklama üçin çaý',
+        description: 'Sowuklama we dümewde ruhlandyryjy we bejeriji çaý.',
+        ingredients: 'Üzerlik, narpyz, melissa, bal.',
+        instructions: 'Ähli dermanlyk ösümlikleri deň mukdarda garyň. Bir nahar çemçesi garyndyny 200 ml gaýnan suwa salyp, 15 minut demläň. Soňra süzüň we bal goşup içiň.',
+        category: 'Sowuklama',
+      ),
+      Recipe(
+        title: 'Aşgazan üçin gaýnatma',
+        description: 'Aşgazan agyrysynda we iýmit siňdirişi gowulandyrmak üçin.',
+        ingredients: 'Buyan köki, çopantelpek.',
+        instructions: 'Buyan köküni owradyp, çopantelpek bilen garyň. Garyndydan bir çaý çemçesini alyp, 250 ml suwda 10 minut haýal ýalnynda gaýnadyň. Süzüp, günde 3 gezek nahardan öň içiň.',
+        category: 'Aşgazan',
+      ),
+      Recipe(
+        title: 'Immunitet üçin bejergi',
+        description: 'Bedeniň garşylygyny artdyrmak üçin peýdaly garyndy.',
+        ingredients: 'Ýandak baly, lök köki, hoz.',
+        instructions: 'Lök köküni oýap, içine ýandak balyny guýuň we 24 sagat saklaň. Şol baly hoz bilen birikdirip, günde bir nahar çemçesi ertirlikden öň kabul ediň.',
+        category: 'Immunitet',
+      ),
+    ];
+
+    for (var recipe in recipes) {
+      await db.insert('recipes', recipe.toMap());
+    }
   }
 
   Future<void> _seedData(Database db) async {

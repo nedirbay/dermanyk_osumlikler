@@ -1,45 +1,84 @@
 import 'package:flutter/material.dart';
+import 'package:plant/core/services/database_service.dart';
+import 'package:plant/data/models/recipe.dart';
+import 'package:plant/data/models/plant.dart';
+import 'package:plant/presentation/pages/recipe_detail_page.dart';
+import 'package:plant/presentation/pages/plant_detail_page.dart';
 
-class FolkMedicinePage extends StatelessWidget {
+class FolkMedicinePage extends StatefulWidget {
   const FolkMedicinePage({super.key});
+
+  @override
+  State<FolkMedicinePage> createState() => _FolkMedicinePageState();
+}
+
+class _FolkMedicinePageState extends State<FolkMedicinePage> {
+  List<Recipe> _recipes = [];
+  List<Plant> _popularPlants = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    final recipes = await DatabaseService.instance.getAllRecipes();
+    // For popular plants, we'll pick some common ones from the database
+    final plants = await DatabaseService.instance.searchPlants('');
+    
+    // Pick specific ones for the popular section if they exist
+    final popularNames = ['Üzerlik', 'Ýandak', 'Buyan', 'Çopantelpek'];
+    final popular = plants.where((p) => popularNames.any((name) => p.name.contains(name))).toList();
+
+    setState(() {
+      _recipes = recipes;
+      _popularPlants = popular.isNotEmpty ? popular : (plants.length > 4 ? plants.sublist(0, 4) : plants);
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 120.0,
-            floating: true,
-            pinned: true,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Halk lukmançylygy',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
+      body: _isLoading 
+        ? const Center(child: CircularProgressIndicator())
+        : CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 120.0,
+                floating: true,
+                pinned: true,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(
+                    'Halk lukmançylygy',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  centerTitle: false,
+                  titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 16),
                 ),
               ),
-              centerTitle: false,
-              titlePadding: const EdgeInsetsDirectional.only(start: 16, bottom: 16),
-            ),
+              SliverPadding(
+                padding: const EdgeInsets.all(16),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    _buildHistorySection(context),
+                    const SizedBox(height: 24),
+                    _buildPopularPlantsSection(context),
+                    const SizedBox(height: 24),
+                    _buildRecipesSection(context),
+                    const SizedBox(height: 32),
+                  ]),
+                ),
+              ),
+            ],
           ),
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                _buildHistorySection(context),
-                const SizedBox(height: 24),
-                _buildPopularPlantsSection(context),
-                const SizedBox(height: 24),
-                _buildRecipesSection(context),
-                const SizedBox(height: 32),
-              ]),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -48,8 +87,8 @@ class FolkMedicinePage extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).primaryColor,
-            Theme.of(context).colorScheme.secondary,
+            const Color(0xFF2E7D32),
+            const Color(0xFF81C784),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -57,7 +96,7 @@ class FolkMedicinePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
+            color: const Color(0xFF2E7D32).withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -91,13 +130,6 @@ class FolkMedicinePage extends StatelessWidget {
   }
 
   Widget _buildPopularPlantsSection(BuildContext context) {
-    final plants = [
-      {'name': 'Üzerlik', 'desc': 'Ruhy tämizlik', 'icon': Icons.flare},
-      {'name': 'Ýandak', 'desc': 'Sowuklama', 'icon': Icons.ac_unit},
-      {'name': 'Buyan', 'desc': 'Üsgülewük', 'icon': Icons.air},
-      {'name': 'Çopantelpek', 'desc': 'Immunitet', 'icon': Icons.verified_user},
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -109,40 +141,53 @@ class FolkMedicinePage extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 100,
+          height: 120,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: plants.length,
+            itemCount: _popularPlants.length,
             itemBuilder: (context, index) {
-              return Container(
-                width: 140,
-                margin: const EdgeInsets.only(right: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                  border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.1)),
+              final plant = _popularPlants[index];
+              return GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PlantDetailPage(plant: plant)),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(plants[index]['icon'] as IconData, color: Theme.of(context).primaryColor),
-                    const SizedBox(height: 8),
-                    Text(
-                      plants[index]['name'] as String,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      plants[index]['desc'] as String,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-                  ],
+                child: Container(
+                  width: 140,
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                    border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.1)),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.eco, color: Color(0xFF2E7D32)),
+                      const SizedBox(height: 8),
+                      Text(
+                        plant.name,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          plant.scientificName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 10, fontStyle: FontStyle.italic, color: Colors.grey[600]),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -153,24 +198,6 @@ class FolkMedicinePage extends StatelessWidget {
   }
 
   Widget _buildRecipesSection(BuildContext context) {
-    final recipes = [
-      {
-        'title': 'Sowuklama üçin çaý',
-        'recipe': 'Üzerlik, narpyz we melissa garyndysy.',
-        'icon': Icons.local_cafe
-      },
-      {
-        'title': 'Aşgazan üçin gaýnatma',
-        'recipe': 'Buyan köki we çopantelpek.',
-        'icon': Icons.medical_services
-      },
-      {
-        'title': 'Immunitet üçin',
-        'recipe': 'Ýandak baly we lök köki.',
-        'icon': Icons.shield
-      },
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -181,7 +208,7 @@ class FolkMedicinePage extends StatelessWidget {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
-        ...recipes.map((r) => Container(
+        ..._recipes.map((r) => Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -195,16 +222,20 @@ class FolkMedicinePage extends StatelessWidget {
                 ],
               ),
               child: ListTile(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RecipeDetailPage(recipe: r)),
+                ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                  child: Icon(r['icon'] as IconData, color: Theme.of(context).primaryColor),
+                  backgroundColor: const Color(0xFF2E7D32).withOpacity(0.1),
+                  child: const Icon(Icons.local_cafe, color: Color(0xFF2E7D32)),
                 ),
                 title: Text(
-                  r['title'] as String,
+                  r.title,
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text(r['recipe'] as String),
+                subtitle: Text(r.description, maxLines: 2, overflow: TextOverflow.ellipsis),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
               ),
             )),

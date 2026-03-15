@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'chatbot_page.dart';
-import 'plants_page.dart';
-import 'dictionary_page.dart';
-import 'folk_medicine_page.dart';
+import 'package:plant/presentation/pages/chatbot_page.dart';
+import 'package:plant/presentation/pages/plants_page.dart';
+import 'package:plant/presentation/pages/dictionary_page.dart';
+import 'package:plant/presentation/pages/folk_medicine_page.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});

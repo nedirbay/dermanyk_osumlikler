@@ -1,12 +1,8 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
+import '../config/api_keys.dart';
 
 class AiService {
-  static const List<String> _apiKeys = [
-    'AIzaSyB-SiU9mnw_xIIgyTjw8djG3if1n8PBPck',
-    'AIzaSyB4ECr5wMeu9ZPnHl-na3hUKqd6jAVbjgk',
-    'AIzaSyAkV9_N0DNGjq0i6xvrtnIvM0gLN3V1j-4',
-    'AIzaSyDjJQCx3Db_fRDI4HLgEqQquoqWR_STP28',
-  ];
+  static const List<String> _apiKeys = ApiKeys.geminiKeys;
   static const String _modelName = 'gemini-3.1-flash-lite-preview';
 
   int _currentKeyIndex = 0;
